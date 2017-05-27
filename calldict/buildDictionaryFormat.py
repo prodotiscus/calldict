@@ -89,7 +89,7 @@ class examples:
             if m == 'full':
                 pass
             elif m == 'w/brackets':
-                cur_content = self.string_clear(cur_content)[1:-1]            
+                cur_content = self.string_clear(cur_content)[1:-1]
             # tag check
             tag_wraps = re.findall(r'<[^>]+>' + cur_content + r'<\/[^>]+>', line)
             if len(tag_wraps) > 0:
@@ -106,8 +106,7 @@ class examples:
                     'mode' : m,
                     'template' : self.make_template(matching_pattern, cur_content)
                 }
-            return False            
-        # 
+        return False
     def between_lines(self, pair, join = True):
         proc = self.cache[pair[0]:pair[1] + 1]
         return '\n'.join(proc) if join else proc
@@ -164,9 +163,8 @@ class examples:
                                 break
                     if ignored:
                         continue
-                    #
                     for pattern in self.ex[q][2]:
                         swc = self.wrap_check(c, pattern, self.ex[q][2][pattern])
                         if swc:
                             type_templates.append((self.ex[q][2][pattern], swc))
-        #print(type_templates)
+        return type_templates
