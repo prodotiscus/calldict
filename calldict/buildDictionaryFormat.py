@@ -43,11 +43,14 @@ class examples:
             string = string.replace('  ', '')
             string = string.replace('\t', '')
             string = string.replace('\n', '')
-        if string[0] in (' ', '\t', '\n'):
-            string = string[1:]
-        if string[-1] in (' ', '\t', '\n'):
-            string = string[:-1]
-        return string
+        try:
+            if string[0] in (' ', '\t', '\n'):
+                string = string[1:]
+            if string[-1] in (' ', '\t', '\n'):
+                string = string[:-1]
+            return string
+        except IndexError:
+            return ''
     def contains_lonely(self, string, pattern):
         b = '! @ # $ % ^ & * ( ) - _ = + \\ | / < > , . ? " \''
         b += '~ ` { } [ ] : ; " №'
@@ -103,14 +106,13 @@ class examples:
                     'mode' : m,
                     'template' : self.make_template(matching_pattern, cur_content)
                 }
-            
+            return False            
         # 
     def between_lines(self, pair, join = True):
         proc = self.cache[pair[0]:pair[1] + 1]
         return '\n'.join(proc) if join else proc
     def process(self):
         pages = []
-        borders = []
         to_del = []
         for e in self.ex:
             markup = requests.get(e[0]).text
@@ -118,51 +120,53 @@ class examples:
             to_del.append(e[1])
             for p in e[2]:
                 to_del.append(p)
-        self.cache = pages[0]
-        for j in range(len(pages[0])):
-            if self.pages_average(j, pages, to_del) < 0.9:
-                borders.append(
-                    (j, self.string_clear(pages[0][j]))
-                )
-        selected_borders = []
-        border_props = {}        
-        for j in range(len(borders)):
-            if j + 1 == len(borders):
-                break
-            border_props[borders[j][0]] = 0
-            for pattern in self.ex[0][2]:                
-                border_cl = self.contains_lonely(
-                    self.between_lines(
-                        (borders[j][0], borders[j + 1][0])
-                    ),
-                    pattern
-                )
-                print((borders[j][0], borders[j + 1][0]))
-                border_props[borders[j][0]] += border_cl
-        print(borders)
-        print(border_props)
-        row = list(set((list(border_props))))
-        priority = sorted(border_props, key=border_props.get)
-        priority = list(reversed(priority))
-        last_index = len(self.cache) - 1
-        print(priority)
-        ignore = {
-            'html-tags' : ['meta']
-        }
-        len_priority = len(priority)
-        for j in range(len_priority):
-            ind = priority[j]
-            next_ind = priority[j + 1] if j < len_priority - 1 else last_index
-            for c in self.between_lines((ind, next_ind)):
-                ignored = False
-                c = self.string_clear(c)
-                if 'html-tags' in ignore:
-                    for ignored_tag in ignore['html-tags']:
-                        if re.search('<\s*' + ignored_tag, c):
-                            ignored = True
-                            break
-                if ignored:
-                    continue
-                #
-                for pattern in self.ex[0][2]:
-                    
+        type_templates = []
+        for q in range(len(pages)):
+            borders = []            
+            self.cache = pages[q]
+            for j in range(len(pages[q])):
+                if self.pages_average(j, pages, to_del) < 0.9:
+                    borders.append(
+                        (j, self.string_clear(pages[q][j]))
+                    )
+            selected_borders = []
+            border_props = {}        
+            for j in range(len(borders)):
+                if j + 1 == len(borders):
+                    break
+                border_props[borders[j][0]] = 0
+                for pattern in self.ex[q][2]:                
+                    border_cl = self.contains_lonely(
+                        self.between_lines(
+                            (borders[j][0], borders[j + 1][0])
+                        ),
+                        pattern
+                    )
+                    border_props[borders[j][0]] += border_cl
+            row = list(set((list(border_props))))
+            priority = sorted(border_props, key=border_props.get)
+            priority = list(reversed(priority))
+            last_index = len(self.cache) - 1
+            ignore = {
+                'html-tags' : ['meta']
+            }
+            len_priority = len(priority)
+            for j in range(len_priority):
+                ind = priority[j]
+                next_ind = priority[j + 1] if j < len_priority - 1 else last_index
+                for c in self.between_lines((ind, next_ind), join = False):
+                    ignored = False
+                    c = self.string_clear(c)
+                    if 'html-tags' in ignore:
+                        for ignored_tag in ignore['html-tags']:
+                            if re.search('<\s*' + ignored_tag, c):
+                                ignored = True
+                                break
+                    if ignored:
+                        continue
+                    #
+                    for pattern in self.ex[q][2]:
+                        swc = self.wrap_check(c, pattern, self.ex[q][2][pattern])
+                        if swc:
+                            type_templates.append((self.ex[q][2][pattern], swc))
+        #print(type_templates)
