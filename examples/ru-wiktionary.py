@@ -23,3 +23,13 @@ e.add_example('https://ru.wiktionary.org/wiki/%D0%BB%D0%BE%D1%81%D1%8C', 'лос
         'увалень' : 'link*syn'
     }
 )
+e.add_example(
+    'https://ru.wiktionary.org/wiki/%D1%83%D0%B7%D0%BE%D1%80%D0%B8%D1%81%D1%82%D0%BE',
+    'узористо',
+    {
+        '[ʊˈzorʲɪstə]' : 'mark.ipa',
+        'рег.' : 'mark.sem',
+        'наречие к прилагательному узористый' : 'meaning',
+        'с узорами' : 'meaning'
+    }
+)
