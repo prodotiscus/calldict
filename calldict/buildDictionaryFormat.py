@@ -7,6 +7,11 @@ import urllib.parse
 class examples:
     def __init__(self):
         self.ex = []
+        self.b = '! @ # $ % ^ & * ( ) - _ = + \\ | / < > , . ? " \''
+        self.b += '~ ` { } [ ] : ; " №'
+        self.b_reg = r'!@#\$\^&\*\(\)-_=\\\|<>,\.\?"\'~`\{\}\[\]:;"№'
+        self.b_symb = b.split()
+        self.b_symb.append(' ')
     def add_example(self, url, title, props):
         self.ex.append([url, title, props])
     def find_substring_index(self, string, substr):
@@ -52,23 +57,19 @@ class examples:
         except IndexError:
             return ''
     def contains_lonely(self, string, pattern):
-        b = '! @ # $ % ^ & * ( ) - _ = + \\ | / < > , . ? " \''
-        b += '~ ` { } [ ] : ; " №'
-        b_symb = b.split()
-        b_symb.append(' ')
         l_string = len(string)
         l_pattern = len(pattern)
         matched = 0
         while pattern in string:
             p_index = string.index(pattern)
             if p_index > 0 and p_index < l_string - 1:
-                if string[p_index - 1] in b_symb and string[p_index + l_pattern] in b_symb:
+                if string[p_index - 1] in self.b_symb and string[p_index + l_pattern] in self.b_symb:
                     matched += 1
             elif p_index == 0:
-                if string[p_index + l_pattern + 1] in b_symb:
+                if string[p_index + l_pattern + 1] in self.b_symb:
                     matched += 1
             elif p_index == len_string - 1:
-                if string[p_index - 1] in b_symb:
+                if string[p_index - 1] in self.b_symb:
                     matched += 1
             string = string.replace(pattern, '', 1)
         return matched
@@ -79,6 +80,12 @@ class examples:
             string = string.replace(urllib.parse.quote(word_split[j]), '@A')
             string = string.replace(word_split[j], '@' + str(j))
         string = re.sub(r'(@A[_%\dA-Z]*)+', '@A', string)
+        if word.endswith('.') and len(word) > 4:
+            occ = re.findall(r'.' + word[:-1], string)
+            if len(occ) > 0:
+                for o in occ:
+                    if occ[0] in self.b_symb:
+                        string = re.sub(occ + r'[^' + self.b_reg + ']*', occ[0] + '@A')
         return string
     def wrap_check(self, line, content, category):
         wraps = []
