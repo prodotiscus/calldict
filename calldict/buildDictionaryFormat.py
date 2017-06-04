@@ -74,11 +74,11 @@ class examples:
         return matched
     def make_template(self, string, word):
         string = string.replace('@', '\\@')
-        word_split = re.split('\s+', word)
+        word_split = re.split(r'\s+', word)
         for j in range(len(word_split)):
             string = string.replace(urllib.parse.quote(word_split[j]), '@A')
             string = string.replace(word_split[j], '@' + str(j))
-        string = re.sub('(@A[_%\dA-Z]*)+', '@A', string)
+        string = re.sub(r'(@A[_%\dA-Z]*)+', '@A', string)
         return string
     def wrap_check(self, line, content, category):
         wraps = []
@@ -158,7 +158,7 @@ class examples:
                     c = self.string_clear(c)
                     if 'html-tags' in ignore:
                         for ignored_tag in ignore['html-tags']:
-                            if re.search('<\s*' + ignored_tag, c):
+                            if re.search(r'<\s*' + ignored_tag, c):
                                 ignored = True
                                 break
                     if ignored:
