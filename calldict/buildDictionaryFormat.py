@@ -85,7 +85,7 @@ class examples:
             if len(occ) > 0:
                 for o in occ:
                     if occ[0] in self.b_symb:
-                        string = re.sub(occ + r'[^' + self.b_reg + ']*', occ[0] + '@A')
+                        string = re.sub(occ + r'[^' + self.b_reg + r']*', occ[0] + '@A')
         return string
     def wrap_check(self, line, content, category):
         wraps = []
